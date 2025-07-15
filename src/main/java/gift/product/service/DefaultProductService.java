@@ -8,9 +8,12 @@ import gift.common.exception.ProductNotFoundException;
 import gift.product.repository.ProductRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class DefaultProductService implements ProductService {
 
     private final ProductRepository productRepository;
@@ -26,43 +29,53 @@ public class DefaultProductService implements ProductService {
             throw new ForbiddenWordException("카카오");
         }
 
-        return productRepository.saveProduct(requestDto);
+        Product product = new Product(requestDto.name(), requestDto.price(), requestDto.imageUrl());
+        Product savedProduct = productRepository.save(product);
+
+        return toResponseDto(savedProduct);
     }
 
     // 특정 상품 조회
     @Override
     public ProductResponseDto getProductById(Long id) {
-        return productRepository.findProductById(id)
+        Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
+        return toResponseDto(product);
     }
 
     // 모든 상품 조회
     @Override
     public List<ProductResponseDto> getAllProducts() {
-        return productRepository.findAllProducts();
+        return productRepository.findAll()
+                .stream()
+                .map(this::toResponseDto)
+                .collect(Collectors.toList());
     }
 
     // 특정 상품 수정
     @Override
     public ProductResponseDto updateProduct(Long id, ProductRequestDto requestDto) {
-        productRepository.updateProduct(id, requestDto);
-        return getProductById(id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        product.update(requestDto.name(), requestDto.price(), requestDto.imageUrl());
+        return toResponseDto(product);
     }
 
     // 특정 상품 삭제
     @Override
     public ProductResponseDto deleteProduct(Long id) {
-        ProductResponseDto product = getProductById(id);
-        productRepository.deleteProduct(id);
-        return product;
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        productRepository.delete(product);
+        return toResponseDto(product);
     }
 
-    private RowMapper<Product> productRowMapper() {
-        return (rs, rowNum) -> new Product(
-                rs.getLong("id"),
-                rs.getString("name"),
-                rs.getInt("price"),
-                rs.getString("image_url")
+    private ProductResponseDto toResponseDto(Product product) {
+        return new ProductResponseDto(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                product.getImageUrl()
         );
     }
 }

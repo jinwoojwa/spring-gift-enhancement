@@ -9,8 +9,10 @@ import gift.member.repository.MemberRepository;
 import gift.common.security.JwtUtil;
 import gift.common.security.PasswordUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class AuthenticationService implements AuthService {
 
     private final MemberRepository memberRepository;
@@ -33,7 +35,7 @@ public class AuthenticationService implements AuthService {
 
         // 회원 저장
         Member member = new Member(requestDto.email(), encodedPassword, requestDto.role());
-        memberRepository.saveMember(member);
+        memberRepository.save(member);
 
         // 토큰 생성
         String token = jwtUtil.generateToken(member.getEmail(), member.getId(), member.getRole().name());
