@@ -1,5 +1,6 @@
 package gift.member.service;
 
+import gift.common.exception.MemberNotFoundException;
 import gift.member.dto.MemberRequestDto;
 import gift.member.dto.MemberResponseDto;
 import gift.member.entity.Member;
@@ -41,7 +42,7 @@ public class DefaultManagementService implements MemberManagementService {
     @Override
     public MemberResponseDto updateMember(Long id, MemberRequestDto requestDto) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다. id=" + id));
+                .orElseThrow(() -> new MemberNotFoundException(id));
 
         String encodedPassword = PasswordUtil.sha256(requestDto.password());
         member.update(requestDto.email(), encodedPassword, requestDto.role());
@@ -52,7 +53,7 @@ public class DefaultManagementService implements MemberManagementService {
     @Override
     public MemberResponseDto deleteMember(Long id) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다. id=" + id));
+                .orElseThrow(() -> new MemberNotFoundException(id));
 
         memberRepository.delete(member);
         return new MemberResponseDto(member);
