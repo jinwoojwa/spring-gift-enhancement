@@ -46,14 +46,14 @@ public class DefaultWishlistService implements WishlistService {
         wishlist.updateQuantity(wishlist.getQuantity() + requestDto.quantity());
         wishlistRepository.save(wishlist);
 
-        return toResponseDto(wishlist);
+        return new WishlistResponseDto(wishlist);
     }
 
     @Override
     public List<WishlistResponseDto> getWishlist(Long memberId) {
         List<Wishlist> wishlists = wishlistRepository.findByMemberId(memberId);
         return wishlists.stream()
-                .map(this::toResponseDto)
+                .map(WishlistResponseDto::new)
                 .collect(Collectors.toList());
     }
 
@@ -63,7 +63,7 @@ public class DefaultWishlistService implements WishlistService {
                 .orElseThrow(WishlistItemNotFoundException::new);
 
         wishlistRepository.delete(wishlist);
-        return toResponseDto(wishlist);
+        return new WishlistResponseDto(wishlist);
     }
 
     @Override
@@ -80,16 +80,6 @@ public class DefaultWishlistService implements WishlistService {
         wishlist.updateQuantity(newQuantity);
         wishlistRepository.save(wishlist);
 
-        return toResponseDto(wishlist);
-    }
-
-    private WishlistResponseDto toResponseDto(Wishlist wishlist) {
-        return new WishlistResponseDto(
-                wishlist.getProduct().getId(),
-                wishlist.getProduct().getName(),
-                wishlist.getQuantity(),
-                wishlist.getProduct().getPrice(),
-                wishlist.getProduct().getImageUrl()
-        );
+        return new WishlistResponseDto(wishlist);
     }
 }
