@@ -1,5 +1,6 @@
 package gift.member.entity;
 
+import gift.member.dto.MemberUpdateRequestDto;
 import jakarta.persistence.*;
 
 @Entity
@@ -34,9 +35,9 @@ public class Member {
     public String getPassword() { return password; }
     public Role getRole() { return role; }
 
-    public void update(String email, String password, Role role) {
-        this.email = email;
-        this.password = password;
-        this.role = role;
+    public void update(MemberUpdateRequestDto dto) {
+        if (dto.email() != null) this.email = dto.email();
+        if (dto.password() != null) this.password = dto.password();
+        if (dto.role() != null) this.role = dto.role();
     }
 }

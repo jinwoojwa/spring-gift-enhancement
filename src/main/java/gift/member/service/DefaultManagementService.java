@@ -3,6 +3,7 @@ package gift.member.service;
 import gift.common.exception.MemberNotFoundException;
 import gift.member.dto.MemberRequestDto;
 import gift.member.dto.MemberResponseDto;
+import gift.member.dto.MemberUpdateRequestDto;
 import gift.member.entity.Member;
 import gift.member.repository.MemberRepository;
 import gift.common.security.PasswordUtil;
@@ -45,7 +46,14 @@ public class DefaultManagementService implements MemberManagementService {
                 .orElseThrow(() -> new MemberNotFoundException(id));
 
         String encodedPassword = PasswordUtil.sha256(requestDto.password());
-        member.update(requestDto.email(), encodedPassword, requestDto.role());
+
+        MemberUpdateRequestDto updateDto = new MemberUpdateRequestDto(
+                requestDto.email(),
+                encodedPassword,
+                requestDto.role()
+        );
+
+        member.update(updateDto);
 
         return new MemberResponseDto(member);
     }
