@@ -32,7 +32,7 @@ public class DefaultProductService implements ProductService {
         Product product = new Product(requestDto.name(), requestDto.price(), requestDto.imageUrl());
         Product savedProduct = productRepository.save(product);
 
-        return toResponseDto(savedProduct);
+        return new ProductResponseDto(savedProduct);
     }
 
     // 특정 상품 조회
@@ -40,7 +40,7 @@ public class DefaultProductService implements ProductService {
     public ProductResponseDto getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
-        return toResponseDto(product);
+        return new ProductResponseDto(product);
     }
 
     // 모든 상품 조회
@@ -48,7 +48,7 @@ public class DefaultProductService implements ProductService {
     public List<ProductResponseDto> getAllProducts() {
         return productRepository.findAll()
                 .stream()
-                .map(this::toResponseDto)
+                .map(ProductResponseDto::new)
                 .collect(Collectors.toList());
     }
 
@@ -58,7 +58,7 @@ public class DefaultProductService implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
         product.update(requestDto.name(), requestDto.price(), requestDto.imageUrl());
-        return toResponseDto(product);
+        return new ProductResponseDto(product);
     }
 
     // 특정 상품 삭제
@@ -67,15 +67,6 @@ public class DefaultProductService implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
         productRepository.delete(product);
-        return toResponseDto(product);
-    }
-
-    private ProductResponseDto toResponseDto(Product product) {
-        return new ProductResponseDto(
-                product.getId(),
-                product.getName(),
-                product.getPrice(),
-                product.getImageUrl()
-        );
+        return new ProductResponseDto(product);
     }
 }
