@@ -23,7 +23,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="product, stat : ${products}" th:if="${stat.index < 5}">
+    <tr th:each="product : ${products.content}">
         <td th:text="${product.id}"></td>
         <td th:text="${product.name}"></td>
         <td th:text="${product.price}"></td>
@@ -45,6 +45,17 @@
     </tr>
     </tbody>
 </table>
+
+<!-- 페이징 UI -->
+<div class="pagination" style="margin-top: 20px;">
+    <a th:if="${products.hasPrevious()}"
+       th:href="@{/api/admin/products(page=${products.number - 1}, size=${products.size})}">이전</a>
+
+    <span>페이지 <span th:text="${products.number + 1}"></span> / <span th:text="${products.totalPages}"></span></span>
+
+    <a th:if="${products.hasNext()}"
+       th:href="@{/api/admin/products(page=${products.number + 1}, size=${products.size})}">다음</a>
+</div>
 
 <!-- 모달 추가 -->
 <div th:insert="~{fragments/modal-add :: addProductModal}"></div> <!-- 상품 추가 모달 -->
