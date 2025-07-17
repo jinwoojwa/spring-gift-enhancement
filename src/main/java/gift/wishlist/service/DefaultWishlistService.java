@@ -11,6 +11,8 @@ import gift.wishlist.dto.WishlistRequestDto;
 import gift.wishlist.dto.WishlistResponseDto;
 import gift.wishlist.entity.Wishlist;
 import gift.wishlist.repository.WishlistRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,11 +52,9 @@ public class DefaultWishlistService implements WishlistService {
     }
 
     @Override
-    public List<WishlistResponseDto> getWishlist(Long memberId) {
-        List<Wishlist> wishlists = wishlistRepository.findByMemberId(memberId);
-        return wishlists.stream()
-                .map(WishlistResponseDto::new)
-                .collect(Collectors.toList());
+    public Page<WishlistResponseDto> getWishlist(Long memberId, Pageable pageable) {
+        Page<Wishlist> wishlistPage = wishlistRepository.findByMemberId(memberId, pageable);
+        return wishlistPage.map(WishlistResponseDto::new);
     }
 
     @Override
