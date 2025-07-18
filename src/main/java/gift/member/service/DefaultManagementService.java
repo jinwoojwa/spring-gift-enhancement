@@ -47,13 +47,10 @@ public class DefaultManagementService implements MemberManagementService {
 
         String encodedPassword = PasswordUtil.sha256(requestDto.password());
 
-        MemberUpdateRequestDto updateDto = new MemberUpdateRequestDto(
-                requestDto.email(),
-                encodedPassword,
-                requestDto.role()
-        );
-
-        member.update(updateDto);
+        member.updateEmail(requestDto.email());
+        member.updatePassword(encodedPassword);
+        member.updateRole(requestDto.role());
+        memberRepository.save(member);
 
         return new MemberResponseDto(member);
     }

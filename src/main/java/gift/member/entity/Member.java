@@ -35,9 +35,13 @@ public class Member {
     public String getPassword() { return password; }
     public Role getRole() { return role; }
 
-    public void update(MemberUpdateRequestDto dto) {
-        if (dto.email() != null) this.email = dto.email();
-        if (dto.password() != null) this.password = dto.password();
-        if (dto.role() != null) this.role = dto.role();
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+    public void updateRole(Role role) {
+        this.role = role;
     }
 }
