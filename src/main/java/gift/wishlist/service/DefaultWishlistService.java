@@ -11,6 +11,8 @@ import gift.wishlist.dto.WishlistRequestDto;
 import gift.wishlist.dto.WishlistResponseDto;
 import gift.wishlist.entity.Wishlist;
 import gift.wishlist.repository.WishlistRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,15 +48,13 @@ public class DefaultWishlistService implements WishlistService {
         wishlist.updateQuantity(wishlist.getQuantity() + requestDto.quantity());
         wishlistRepository.save(wishlist);
 
-        return toResponseDto(wishlist);
+        return new WishlistResponseDto(wishlist);
     }
 
     @Override
-    public List<WishlistResponseDto> getWishlist(Long memberId) {
-        List<Wishlist> wishlists = wishlistRepository.findByMemberId(memberId);
-        return wishlists.stream()
-                .map(this::toResponseDto)
-                .collect(Collectors.toList());
+    public Page<WishlistResponseDto> getWishlist(Long memberId, Pageable pageable) {
+        Page<Wishlist> wishlistPage = wishlistRepository.findByMemberId(memberId, pageable);
+        return wishlistPage.map(WishlistResponseDto::new);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class DefaultWishlistService implements WishlistService {
                 .orElseThrow(WishlistItemNotFoundException::new);
 
         wishlistRepository.delete(wishlist);
-        return toResponseDto(wishlist);
+        return new WishlistResponseDto(wishlist);
     }
 
     @Override
@@ -80,16 +80,6 @@ public class DefaultWishlistService implements WishlistService {
         wishlist.updateQuantity(newQuantity);
         wishlistRepository.save(wishlist);
 
-        return toResponseDto(wishlist);
-    }
-
-    private WishlistResponseDto toResponseDto(Wishlist wishlist) {
-        return new WishlistResponseDto(
-                wishlist.getProduct().getId(),
-                wishlist.getProduct().getName(),
-                wishlist.getQuantity(),
-                wishlist.getProduct().getPrice(),
-                wishlist.getProduct().getImageUrl()
-        );
+        return new WishlistResponseDto(wishlist);
     }
 }

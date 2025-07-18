@@ -3,11 +3,13 @@ package gift.product.controller;
 import gift.product.dto.ProductRequestDto;
 import gift.product.dto.ProductResponseDto;
 import gift.product.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/api/admin/products")
@@ -21,8 +23,13 @@ public class AdminProductController {
 
     // 목록 출력
     @GetMapping
-    public String showProductManagePage(Model model) {
-        List<ProductResponseDto> products = productService.getAllProducts();
+    public String showProductManagePage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size,
+            Model model) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<ProductResponseDto> products = productService.getAllProducts(pageable);
+
         model.addAttribute("products", products);
         return "admin/index";
     }

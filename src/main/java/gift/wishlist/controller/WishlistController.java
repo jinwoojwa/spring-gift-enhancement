@@ -4,6 +4,10 @@ import gift.common.annotation.LoginMember;
 import gift.wishlist.dto.WishlistRequestDto;
 import gift.wishlist.dto.WishlistResponseDto;
 import gift.wishlist.service.WishlistService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +37,11 @@ public class WishlistController {
 
     // 위시 리스트 상품 목록 조회 API
     @GetMapping
-    public ResponseEntity<List<WishlistResponseDto>> getWishlist(@LoginMember Long memberId) {
-        List<WishlistResponseDto> productsOfWishlist = wishlistService.getWishlist(memberId);
+    public ResponseEntity<Page<WishlistResponseDto>> getWishlist(
+            @LoginMember Long memberId,
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        Page<WishlistResponseDto> productsOfWishlist = wishlistService.getWishlist(memberId, pageable);
 
         return ResponseEntity.ok(productsOfWishlist);
     }

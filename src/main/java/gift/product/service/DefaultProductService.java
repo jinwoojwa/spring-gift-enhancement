@@ -6,11 +6,10 @@ import gift.product.entity.Product;
 import gift.common.exception.ForbiddenWordException;
 import gift.common.exception.ProductNotFoundException;
 import gift.product.repository.ProductRepository;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,7 +31,7 @@ public class DefaultProductService implements ProductService {
         Product product = new Product(requestDto.name(), requestDto.price(), requestDto.imageUrl());
         Product savedProduct = productRepository.save(product);
 
-        return toResponseDto(savedProduct);
+        return new ProductResponseDto(savedProduct);
     }
 
     // 특정 상품 조회
@@ -40,16 +39,14 @@ public class DefaultProductService implements ProductService {
     public ProductResponseDto getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
-        return toResponseDto(product);
+        return new ProductResponseDto(product);
     }
 
     // 모든 상품 조회
     @Override
-    public List<ProductResponseDto> getAllProducts() {
-        return productRepository.findAll()
-                .stream()
-                .map(this::toResponseDto)
-                .collect(Collectors.toList());
+    public Page<ProductResponseDto> getAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable)
+                .map(ProductResponseDto::new);
     }
 
     // 특정 상품 수정
@@ -58,7 +55,7 @@ public class DefaultProductService implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
         product.update(requestDto.name(), requestDto.price(), requestDto.imageUrl());
-        return toResponseDto(product);
+        return new ProductResponseDto(product);
     }
 
     // 특정 상품 삭제
@@ -67,15 +64,6 @@ public class DefaultProductService implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
         productRepository.delete(product);
-        return toResponseDto(product);
-    }
-
-    private ProductResponseDto toResponseDto(Product product) {
-        return new ProductResponseDto(
-                product.getId(),
-                product.getName(),
-                product.getPrice(),
-                product.getImageUrl()
-        );
+        return new ProductResponseDto(product);
     }
 }
