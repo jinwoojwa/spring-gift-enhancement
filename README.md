@@ -55,3 +55,20 @@
 - 상품 옵션의 수량을 지정된 숫자만큼 빼는 기능을 구현
 - 구현한 기능에 대해 적절한 단위 테스트를 구현
 
+<br>
+
+#### 세부 구현 내용
+
+- 도메인 설계
+  + Option 엔티티는 Product 엔티티와 다대일(ManyToOne) 관계로 매핑
+  + OptionName, OptionQuantity를 도입하여 유효성 검증을 책임지도록 분리
+
+- API 구현
+  + `GET /api/products/{productId}/options`
+    * 특정 상품의 모든 옵션 목록을 조회하는 API 추가
+  + `POST /api/products/{productId}/options`
+    * 상품에 옵션을 추가하는 API 추가
+    * 입력값 검증 및 중복 이름 검사 후 저장
+
+- 테스트
+  + OptionName, OptionQuantity 값 객체에 대한 단위 테스트로 유효성 검증 확인
