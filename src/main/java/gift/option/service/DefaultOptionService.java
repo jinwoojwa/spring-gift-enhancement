@@ -1,8 +1,10 @@
 package gift.option.service;
 
 import gift.common.exception.ProductNotFoundException;
+import gift.option.dto.OptionRequestDto;
 import gift.option.dto.OptionResponseDto;
 import gift.option.entity.Option;
+import gift.option.entity.OptionName;
 import gift.option.repository.OptionRepository;
 import gift.product.entity.Product;
 import gift.product.repository.ProductRepository;
@@ -34,5 +36,23 @@ public class DefaultOptionService implements OptionService {
         return options.stream()
                 .map(OptionResponseDto::from)
                 .toList();
+    }
+
+    @Override
+    public OptionResponseDto addOption(Long productId, OptionRequestDto requestDto, Long memberId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
+
+        OptionName optionName = new OptionName(requestDto.name());
+
+        boolean isDuplicate = optionRepository.existsByProductAndName(product, optionName);
+        if (isDuplicate) {
+            throw new IllegalArgumentException(requestDto.name() + "이라는 이름의 옵션이 이미 존재합니다.");
+        }
+
+        Option option = Option.of(requestDto.name(), requestDto.quantity(), product);
+        optionRepository.save(option);
+
+        return OptionResponseDto.from(option);
     }
 }
