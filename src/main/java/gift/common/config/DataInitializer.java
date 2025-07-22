@@ -15,14 +15,12 @@ public class DataInitializer implements CommandLineRunner {
 
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
-    private final OptionRepository optionRepository;
 
     public DataInitializer(ProductRepository productRepository,
-                           MemberRepository memberRepository,
-                           OptionRepository optionRepository) {
+                           MemberRepository memberRepository
+                           ) {
         this.productRepository = productRepository;
         this.memberRepository = memberRepository;
-        this.optionRepository = optionRepository;
     }
 
     @Override
@@ -32,20 +30,14 @@ public class DataInitializer implements CommandLineRunner {
         Product americano = new Product("아메리카노", 4000, "https://image.istarbucks.co.kr/upload/store/skuimg/2025/06/[110563]_20250626094354080.jpg");
         Product cappuccino = new Product("카푸치노", 5000, "https://image.istarbucks.co.kr/upload/store/skuimg/2021/04/[38]_20210415154821991.jpg");
 
+        americano.addOption(Option.of("Tall", 10, americano));
+        americano.addOption(Option.of("Grande", 5, americano));
+        coldBrew.addOption(Option.of("Tall", 3, coldBrew));
+        cappuccino.addOption(Option.of("Venti", 2, cappuccino));
+
         productRepository.save(coldBrew);
         productRepository.save(americano);
         productRepository.save(cappuccino);
-
-        // 옵션 초기 데이터
-        Option option1 = Option.of("Tall", 10, americano);
-        Option optton2 = Option.of("Grande", 5, americano);
-        Option option3 = Option.of("Tall", 3, coldBrew);
-        Option option4 = Option.of("Venti", 2, cappuccino);
-
-        optionRepository.save(option1);
-        optionRepository.save(optton2);
-        optionRepository.save(option3);
-        optionRepository.save(option4);
 
         // 회원 초기 데이터
         memberRepository.save(new Member("user1@example.com", "password1", Role.USER));
