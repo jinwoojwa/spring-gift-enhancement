@@ -51,6 +51,8 @@ public class DefaultOptionService implements OptionService {
         }
 
         Option option = Option.of(requestDto.name(), requestDto.quantity(), product);
+        product.addOption(option);
+
         optionRepository.save(option);
 
         return OptionResponseDto.from(option);

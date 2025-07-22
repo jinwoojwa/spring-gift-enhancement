@@ -1,5 +1,8 @@
 package gift.product.service;
 
+import gift.common.exception.ProductOptionRequiredException;
+import gift.option.dto.OptionRequestDto;
+import gift.option.entity.Option;
 import gift.product.dto.ProductRequestDto;
 import gift.product.dto.ProductResponseDto;
 import gift.product.entity.Product;
@@ -29,8 +32,17 @@ public class DefaultProductService implements ProductService {
         }
 
         Product product = new Product(requestDto.name(), requestDto.price(), requestDto.imageUrl());
-        Product savedProduct = productRepository.save(product);
 
+        if (requestDto.options() == null ||  requestDto.options().isEmpty()) {
+            throw new ProductOptionRequiredException();
+        }
+
+        for (OptionRequestDto optionRequestDto : requestDto.options()) {
+            Option option = Option.of(optionRequestDto.name(), optionRequestDto.quantity(), product);
+            product.addOption(option);
+        }
+
+        Product savedProduct = productRepository.save(product);
         return new ProductResponseDto(savedProduct);
     }
 

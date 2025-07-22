@@ -57,4 +57,9 @@ public class Product {
         this.price = price;
         this.imageUrl = imageUrl;
     }
+
+    public void addOption(Option option) {
+        this.options.add(option);
+        option.setProduct(this);
+    }
 }
