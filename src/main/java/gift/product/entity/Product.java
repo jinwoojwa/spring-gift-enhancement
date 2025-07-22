@@ -1,5 +1,7 @@
 package gift.product.entity;
 
+import gift.common.exception.ProductOptionRequiredException;
+import gift.option.dto.OptionRequestDto;
 import gift.option.entity.Option;
 import jakarta.persistence.*;
 
@@ -29,11 +31,27 @@ public class Product {
     protected Product() {
     }
 
-    public Product(String name, int price, String imageUrl) {
+    private Product(String name, int price, String imageUrl) {
         this.name = name;
         this.price = price;
         this.imageUrl = imageUrl;
     }
+
+    public static Product createProduct(String name, int price, String imageUrl, List<OptionRequestDto> optionDto) {
+        if (optionDto == null || optionDto.isEmpty()) {
+            throw new ProductOptionRequiredException();
+        }
+
+        Product product = new Product(name, price, imageUrl);
+
+        for (OptionRequestDto dto : optionDto) {
+            Option option = Option.of(dto.name(), dto.quantity(), product);
+            product.addOption(option);
+        }
+
+        return product;
+    }
+
 
     public Long getId() {
         return id;

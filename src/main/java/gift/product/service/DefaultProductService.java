@@ -1,8 +1,5 @@
 package gift.product.service;
 
-import gift.common.exception.ProductOptionRequiredException;
-import gift.option.dto.OptionRequestDto;
-import gift.option.entity.Option;
 import gift.product.dto.ProductRequestDto;
 import gift.product.dto.ProductResponseDto;
 import gift.product.entity.Product;
@@ -31,16 +28,12 @@ public class DefaultProductService implements ProductService {
             throw new ForbiddenWordException("카카오");
         }
 
-        Product product = new Product(requestDto.name(), requestDto.price(), requestDto.imageUrl());
-
-        if (requestDto.options() == null ||  requestDto.options().isEmpty()) {
-            throw new ProductOptionRequiredException();
-        }
-
-        for (OptionRequestDto optionRequestDto : requestDto.options()) {
-            Option option = Option.of(optionRequestDto.name(), optionRequestDto.quantity(), product);
-            product.addOption(option);
-        }
+        Product product = Product.createProduct(
+                requestDto.name(),
+                requestDto.price(),
+                requestDto.imageUrl(),
+                requestDto.options()
+        );
 
         Product savedProduct = productRepository.save(product);
         return new ProductResponseDto(savedProduct);
